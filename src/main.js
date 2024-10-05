@@ -1,38 +1,64 @@
-import { fetchImages } from './js/pixabay-api';
-import { renderImages, clearGallery, showLoader, hideLoader } from './js/render-functions';
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
+import { fetchImages } from './js/pixabay-api.js';
+import { renderImages, clearGallery, showLoadMoreButton, hideLoadMoreButton, showEndOfResultsMessage, smoothScroll, showError} from './js/render-functions.js';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-let lightbox;
+let query = '';
+let page = 1;
+let totalHits = 0;
+let simpleLightbox;
 
-document.querySelector('#search-form').addEventListener('submit', async (event) => {
+const form = document.querySelector('.search-form');
+const loadMoreBtn = document.querySelector('.load-more');
+const gallery = document.querySelector('.gallery');
+
+form.addEventListener('submit', onSearch);
+loadMoreBtn.addEventListener('click', onLoadMore);
+
+async function onSearch(event) {
   event.preventDefault();
   
-  const query = event.target.querySelector('input[name="searchQuery"]').value.trim();
-  
-  if (!query) {
-    iziToast.error({ title: 'Error', message: 'Please enter a search query!' });
-    return;
-  }
+  query = event.target.elements.searchQuery.value.trim();
+  if (query === '') return;
 
+  page = 1;
   clearGallery();
-  showLoader();
-
+  hideLoadMoreButton();
+  
   try {
-    const data = await fetchImages(query);
+    const data = await fetchImages(query, page);
+    totalHits = data.totalHits;
     
-    if (data.hits.length === 0) {
-      iziToast.error({ title: 'No Results', message: 'Sorry, there are no images matching your search query. Please try again!' });
-    } else {
-      renderImages(data.hits);
-      lightbox = new SimpleLightbox('.gallery a');
-      lightbox.refresh();
+    if (totalHits === 0) {
+      return alert('No images found for your query.');
+    }
+    
+    renderImages(data.hits);
+    simpleLightbox = new SimpleLightbox('.gallery a').refresh();
+    if (data.totalHits > data.hits.length) {
+      showLoadMoreButton();
     }
   } catch (error) {
-    iziToast.error({ title: 'Error', message: 'Failed to fetch images. Please try again!' });
-  } finally {
-    hideLoader();
+    console.error(error);
   }
-});
+}
+
+async function onLoadMore() {
+  page += 1;
+
+  try {
+    const data = await fetchImages(query, page);
+    renderImages(data.hits);
+    simpleLightbox.refresh();
+
+    const totalLoadedImages = gallery.children.length;
+    if (totalLoadedImages >= totalHits) {
+      hideLoadMoreButton();
+      showEndOfResultsMessage();
+    }
+
+    smoothScroll();
+  } catch (error) {
+    console.error(error);
+  }
+}
