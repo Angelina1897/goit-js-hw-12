@@ -76,7 +76,21 @@ header {
   width: 360px;
   height: 49px;
 }
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #343a40;
+  margin: 0;
+}
 
+.info-item span {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.33333;
+  letter-spacing: 0.04em;
+  color: #2e2f42;
+}
 @keyframes spin {
   to {
     transform: rotate(360deg);
