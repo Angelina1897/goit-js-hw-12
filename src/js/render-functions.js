@@ -1,57 +1,26 @@
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
-
 export function renderImages(images) {
   const gallery = document.querySelector('.gallery');
-  const markup = images
-    .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => `
-            <li class="gallery-item">
-                <a href="${largeImageURL}" class="gallery-link">
-                    <img src="${webformatURL}" alt="${tags}" class="gallery-image" />
-                </a>
-                <div class="info">
-                    <p class="info-item"><span>Likes</span> ${likes}</p>
-                    <p class="info-item"><span>Views</span> ${views}</p>
-                    <p class="info-item"><span>Comments</span> ${comments}</p>
-                    <p class="info-item"><span>Downloads</span> ${downloads}</p>
-                </div>
-            </li>
-        `
-    )
-    .join('');
+  const markup = images.map(image => `
+    <a href="${image.largeImageURL}" class="gallery-item">
+      <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy"/>
+      <div class="info">
+        <p><b>Likes:</b> ${image.likes}</p>
+        <p><b>Views:</b> ${image.views}</p>
+        <p><b>Comments:</b> ${image.comments}</p>
+        <p><b>Downloads:</b> ${image.downloads}</p>
+      </div>
+    </a>
+  `).join('');
 
-  gallery.insertAdjacentHTML('beforeend', markup);
+  gallery.innerHTML = markup;
 }
 
 export function clearGallery() {
   document.querySelector('.gallery').innerHTML = '';
 }
 
-export function showError(message) {
-  iziToast.error({
-    title: 'Error',
-    message,
-  });
-}
-
-export function showEndMessage() {
-  iziToast.info({
-    title: 'End of Results',
-    message: "We're sorry, but you've reached the end of search results.",
-  });
-}
-
 export function showLoader() {
-  document.querySelector('.loader').style.display = 'flex';
+  document.querySelector('.loader').style.display = 'block';
 }
 
 export function hideLoader() {
