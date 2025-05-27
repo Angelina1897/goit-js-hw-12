@@ -42,3 +42,17 @@ export function renderImages(images, galleryElement) {
 export function clearGallery(galleryElement) {
 	galleryElement.innerHTML = '';
 }
+
+export function showLoader(loaderElement) {
+	loaderElement.classList.remove('hidden');
+}
+
+export function hideLoader(loaderElement) {
+	loaderElement.classList.add('hidden');
+}
+export function showLoadMoreButton(buttonElement) {
+	buttonElement.classList.remove('hidden');
+}
+export function hideLoadMoreButton(buttonElement) {
+	buttonElement.classList.add('hidden');
+}
